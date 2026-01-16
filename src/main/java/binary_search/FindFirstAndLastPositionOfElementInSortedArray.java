@@ -1,4 +1,4 @@
-package arrays;
+package binary_search;
 
 /**
  * <a href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array">...</a>

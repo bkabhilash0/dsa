@@ -1,4 +1,4 @@
-package arrays;
+package binary_search;
 
 /**
  * <a href="https://leetcode.com/problems/search-in-rotated-sorted-array-ii">...</a>

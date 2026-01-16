@@ -1,4 +1,4 @@
-package arrays;
+package binary_search;
 
 import java.util.HashMap;
 
