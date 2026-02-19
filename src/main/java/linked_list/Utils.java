@@ -1,6 +1,7 @@
 package linked_list;
 
 import linked_list.components.ListNode;
+import linked_list.components.Node;
 
 public class Utils {
     public static void printList(ListNode head) {
@@ -9,6 +10,16 @@ public class Utils {
             head = head.next;
         }
         System.out.println();
+    }
+
+    public static Node createList2(int size) {
+        Node head = new Node(1);
+        Node current = head;
+        for (int i = 2; i <= size; i++) {
+            current.next = new Node(i);
+            current = current.next;
+        }
+        return head;
     }
 
     public static ListNode createList(int size) {
