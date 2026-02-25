@@ -45,14 +45,29 @@ public class ReverseALinkedList {
         return prev;
     }
 
+    // Time Complex: O(n) where n is the number of nodes in the linked list, we are iterating through the linked once
+    // Space Complex: O(n) where n is the number of nodes in the linked list, we are using the call stack to store the recursive calls,
+    // the maximum depth of the recursion will be equal to the number of nodes in the linked list
+    private ListNode recursive(ListNode head, ListNode current) {
+        //Utils.printList(current);
+        if (current == null || current.next == null) {
+            return current;
+        }
+
+        ListNode reversed = recursive(head, current.next);
+        current.next.next = current;
+        current.next = null;
+        return reversed;
+    }
+
     public ListNode reverseList(ListNode head) {
-        return optimal(head);
+        return recursive(head, head);
     }
 
     public static void main(String[] args) {
         ReverseALinkedList ral = new ReverseALinkedList();
         ListNode head = Utils.createList(5);
-        Utils.printList(head);
+//        Utils.printList(head);
         ListNode res = ral.reverseList(head);
         Utils.printList(res);
     }
