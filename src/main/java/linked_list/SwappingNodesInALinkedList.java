@@ -60,20 +60,44 @@ public class SwappingNodesInALinkedList {
         ListNode kthNodeFromStart = nodes.get(k - 1);
         // 5 - 2 = 3, so we need to get the node at index 3 which is the 4th node in the linked list, since the list is 1-indexed
         ListNode kthNodeFromEnd = nodes.get(n - k);
-        kthNodeFromStart.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
-        kthNodeFromEnd.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
-        kthNodeFromStart.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
+        System.out.println("Before Swapping: " + kthNodeFromStart.val + " " + kthNodeFromEnd.val);
+        int temp = kthNodeFromStart.val;
+        kthNodeFromStart.val = kthNodeFromEnd.val;
+        kthNodeFromEnd.val = temp;
+//        kthNodeFromStart.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
+//        kthNodeFromEnd.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
+//        kthNodeFromStart.val = kthNodeFromStart.val ^ kthNodeFromEnd.val;
+        return head;
+    }
+
+    // Time Complex: O(n) where n is the number of nodes in the linked list, we are iterating through the linked once
+    // Space Complex: O(1) since we are not using any extra space to store
+    private ListNode moreOptimal(ListNode head, int k) {
+        ListNode fast = head;
+        ListNode slow = head;
+        while (k > 1) {
+            fast = fast.next;
+            k--;
+        }
+        ListNode kthNodeFromStart = fast;
+        while (fast.next != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        int temp = kthNodeFromStart.val;
+        kthNodeFromStart.val = slow.val;
+        slow.val = temp;
         return head;
     }
 
     public ListNode swapNodes(ListNode head, int k) {
-        return optimal(head, k);
+        return moreOptimal(head, k);
     }
 
     public static void main(String[] args) {
         SwappingNodesInALinkedList snial = new SwappingNodesInALinkedList();
         ListNode head = Utils.createList(3);
-        ListNode res = snial.swapNodes(head, 1);
+        ListNode res = snial.swapNodes(head, 2);
         Utils.printList(res);
     }
 }
