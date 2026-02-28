@@ -16,20 +16,16 @@ public class BinaryTreePaths {
     public void execute(TreeNode root, ArrayList<String> res, ArrayList<Integer> path) {
         if (root == null) return;
         if (root.left == null && root.right == null) {
+            path.add(root.val);
             String finalPath = mapIntToString(path);
             res.add(finalPath);
+            path.removeLast();
             return;
         }
-        if (root.left != null) {
-            path.add(root.left.val);
-            execute(root.left, res, path);
-            path.removeLast();
-        }
-        if (root.right != null) {
-            path.add(root.right.val);
-            execute(root.right, res, path);
-            path.removeLast();
-        }
+        path.add(root.val);
+        execute(root.left, res, path);
+        execute(root.right, res, path);
+        path.removeLast();
     }
 
     private String mapIntToString(ArrayList<Integer> path) {
@@ -49,7 +45,7 @@ public class BinaryTreePaths {
         ArrayList<String> res = new ArrayList<>();
         ArrayList<Integer> path = new ArrayList<>();
         if(root == null) return res;
-        path.add(root.val);
+//        path.add(root.val);
         execute(root, res, path);
         return res;
     }
