@@ -1,4 +1,4 @@
-package graphs;
+package binary_tree;
 
 import graphs.components.TreeNode;
 
