@@ -24,8 +24,8 @@ public class WordLadderII {
         Map<String, List<String>> patternMap = new HashMap<>();
 
         // Create Pattern Map
-        for(String word : wordList) {
-            for(int i = 0; i < word.length(); i++) {
+        for (String word : wordList) {
+            for (int i = 0; i < word.length(); i++) {
                 String pattern = word.substring(0, i) + "*" + word.substring(i + 1);
                 patternMap.computeIfAbsent(pattern, k -> new ArrayList<>()).add(word);
             }
@@ -48,7 +48,7 @@ public class WordLadderII {
                 for (int j = 0; j < word.length(); j++) {
                     String pattern = word.substring(0, j) + "*" + word.substring(j + 1);
                     List<String> neighbors = patternMap.get(pattern);
-                    if(neighbors == null) continue;
+                    if (neighbors == null) continue;
                     for (String newWord : neighbors) {
                         // The new word has to be in the wordList and not present in the visited array
                         if (newWord.equals(word)) continue;
@@ -75,101 +75,88 @@ public class WordLadderII {
             if (words.size() != minSize) {
                 break;
             }
-            if(words.getLast().equals(endWord)) {
+            if (words.getLast().equals(endWord)) {
                 res.add(words);
             }
         }
         return res;
     }
 
-    private List<List<String>> executeMoreOptimal(String beginWord, String endWord, List<String> wordList) {
-
-        List<List<String>> res = new ArrayList<>();
-        Set<String> dict = new HashSet<>(wordList);
-        if (!dict.contains(endWord)) return res;
-
-        Map<String, List<String>> parents = new HashMap<>();
-
-        Set<String> current = new HashSet<>();
-        current.add(beginWord);
-
-        boolean found = false;
-
-        while (!current.isEmpty() && !found) {
-
-            dict.removeAll(current);
-            Set<String> next = new HashSet<>();
-
-            for (String word : current) {
-
-                char[] chars = word.toCharArray();
-
-                for (int i = 0; i < chars.length; i++) {
-
-                    char old = chars[i];
-
-                    for (char c = 'a'; c <= 'z'; c++) {
-
-                        chars[i] = c;
-                        String newWord = new String(chars);
-
-                        if (!dict.contains(newWord)) continue;
-
-                        next.add(newWord);
-
-                        parents
-                                .computeIfAbsent(newWord, k -> new ArrayList<>())
-                                .add(word);
-
-                        if (newWord.equals(endWord))
-                            found = true;
-                    }
-
-                    chars[i] = old;
-                }
-            }
-
-            current = next;
+    private void dfs(String word, String beginWord, List<String> path, Map<String, Set<String>> parentMap, List<List<String>> res) {
+        if (word.equals(beginWord)) {
+            // Create a copy of the path else, reference modification will cause issue
+            List<String> pathCopy = new ArrayList<>(path);
+            Collections.reverse(pathCopy);
+            res.add(pathCopy);
+            return;
         }
 
+        if(!parentMap.containsKey(word)) return;
+
+        // backtrack with the parent
+        for (String parent : parentMap.get(word)) {
+            path.add(parent);
+            dfs(parent, beginWord, path, parentMap, res);
+            path.removeLast();
+        }
+    }
+
+    // Time Complexity: O(M * N * k) + O(num of Shortest Paths) : M -> Number of words, N -> Length of the word, k -> No of Neighbors
+    // Time Complexity: O(N) -> Simplified
+    private List<List<String>> parentMapMethod(String beginWord, String endWord, List<String> wordList) {
+        Set<String> dict = new HashSet<>(wordList);
+        List<List<String>> res = new ArrayList<>();
+        if (!dict.contains(endWord)) return res;
+        Map<String, Set<String>> parentMap = new HashMap<>();
+        Queue<String> queue = new ArrayDeque<>();
+
+        queue.offer(beginWord);
+        dict.remove(beginWord);
+        // This is only used to check if the end word was found, we aren't terminating the loop based on this as we need to build parent map for words
+        boolean found = false;
+        while (!queue.isEmpty() && !found) {
+            // Initialize a new queue for next level
+            Set<String> levelVisited = new HashSet<>();
+            int size = queue.size();
+            for (int z = 0; z < size; z++) {
+                String word = queue.poll();
+                for (int i = 0; i < word.length(); i++) {
+                    char[] chars = word.toCharArray();
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        chars[i] = c;
+                        String newWord = new String(chars);
+                        if (!dict.contains(newWord)) continue;
+                        if (levelVisited.add(newWord)) {
+                            queue.offer(newWord);
+                        }
+                        parentMap.computeIfAbsent(newWord, k -> new HashSet<>()).add(word);
+                        if (newWord.equals(endWord)) {
+                            found = true;
+                        }
+                        chars[i] = word.charAt(i);
+                    }
+                }
+            }
+            // Mark the all visited ones in the visited -> We can also remove it from the dict
+            dict.removeAll(levelVisited);
+        }
         if (!found) return res;
 
         List<String> path = new ArrayList<>();
         path.add(endWord);
-
-        dfs(endWord, beginWord, parents, path, res);
-
+        dfs(endWord, beginWord, path, parentMap, res);
         return res;
     }
 
-    private void dfs(String word, String beginWord,
-                     Map<String, List<String>> parents,
-                     List<String> path,
-                     List<List<String>> res) {
-
-        if (word.equals(beginWord)) {
-            List<String> copy = new ArrayList<>(path);
-            Collections.reverse(copy);
-            res.add(copy);
-            return;
-        }
-
-        for (String parent : parents.getOrDefault(word, new ArrayList<>())) {
-            path.add(parent);
-            dfs(parent, beginWord, parents, path, res);
-            path.remove(path.size() - 1);
-        }
-    }
-
     public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
-        return executeMoreOptimal(beginWord, endWord, wordList);
+        return parentMapMethod(beginWord, endWord, wordList);
     }
 
     public static void main(String[] args) {
         WordLadderII wordLadderII = new WordLadderII();
-        String beginWord = "a";
-        String endWord = "c";
-        List<String> wordList = List.of("a","b","c");
+        String beginWord = "hit";
+        String endWord = "cog";
+        List<String> wordList = List.of("hot", "dot", "dog", "lot", "log", "cog");
         List<List<String>> res = wordLadderII.findLadders(beginWord, endWord, wordList);
         System.out.println(res);
     }
