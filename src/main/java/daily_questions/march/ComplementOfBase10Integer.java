@@ -14,6 +14,12 @@ public class ComplementOfBase10Integer {
         if (n == 0) {
             return 1;
         }
+        // Highest 1 bit means flip all the bit to 0 and have only the first bit as 1
+        // Eg: 5 -> 101 -> highest 1 bit is 100
+        // Now shift left, this add one 0 at the end. So 100 << 1 -> 1000
+        // Now sub 1 from 1000, it gives 111
+        // This is like getting the number sequence, to find which mask i.e. the nears number with all ones of the same size
+        // Then XOR
         int temp = (Integer.highestOneBit(n) << 1) - 1;
         return n ^ temp;
     }
