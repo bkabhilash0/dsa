@@ -1,4 +1,4 @@
-package daily_questions.march.april;
+package daily_questions.april;
 
 import java.util.Arrays;
 import java.util.Comparator;
