@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Date: April 10, 2026,
+ * Date: April 10 & 11, 2026,
  * <a href="https://leetcode.com/problems/minimum-distance-between-three-equal-elements-i/">Minimum Distance Between Three Equal Elements I</a>
  * You are given an integer array nums.
  * A tuple (i, j, k) of 3 distinct indices is good if nums[i] == nums[j] == nums[k].
@@ -69,8 +69,30 @@ public class MinDistanceBetweenThreeEqElementsI {
         return ans == Integer.MAX_VALUE ? -1 : ans;
     }
 
+    // When i < j < k the |i-j| + |j-k| + |k-i| =  (j - i) + (k - j) + (k - i) = 2 * (k - i)
+    // Time Complexity: O(n), where n is the length of the input array nums.
+    // Space Complexity: O(n), in the worst case, if all elements in nums are same
+    private int optimal(int[] nums) {
+        int n = nums.length;
+        if (n < 3) return -1;
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            map.computeIfAbsent(nums[i], k -> new java.util.ArrayList<>()).add(i);
+        }
+
+        int ans = Integer.MAX_VALUE;
+        for (List<Integer> list : map.values()) {
+            if (list.size() < 3) continue;
+            for (int i = 0; i < list.size() - 2; i++) {
+                int distance = 2 * (list.get(i + 2) - list.get(i));
+                ans = Math.min(ans, distance);
+            }
+        }
+        return ans == Integer.MAX_VALUE ? -1 : ans;
+    }
+
     public int minimumDistance(int[] nums) {
-        return better(nums);
+        return optimal(nums);
     }
 
     public static void main(String[] args) {
